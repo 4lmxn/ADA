@@ -1,0 +1,35 @@
+#include <stdio.h>
+
+int main() {
+    int a[7][7], n, i, j, k;
+
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the cost adjacency matrix. Enter 999 for Infinity:\n");
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+            scanf("%d", &a[i][j]);
+
+    for (k = 0; k < n; k++) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                if (a[i][j] > a[i][k] + a[k][j])
+                    a[i][j] = a[i][k] + a[k][j];
+            }
+        }
+    }
+
+    printf("Following matrix shows the shortest distances between every pair of vertices:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            if (a[i][j] == 999)
+                printf("%7s", "INF");
+            else
+                printf("%7d", a[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
