@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void merge(long int a[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    long int leftArr[n1], rightArr[n2];
+
+    for (int i = 0; i < n1; i++) leftArr[i] = a[left + i];
+    for (int j = 0; j < n2; j++) rightArr[j] = a[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (leftArr[i] <= rightArr[j]) a[k++] = leftArr[i++];
+        else a[k++] = rightArr[j++];
+    }
+
+    while (i < n1) a[k++] = leftArr[i++];
+    while (j < n2) a[k++] = rightArr[j++];
+}
+
+void mergeSort(long int a[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(a, left, mid);
+        mergeSort(a, mid + 1, right);
+        merge(a, left, mid, right);
+    }
+}
+
+int main() {
+    long int a[100000];
+    float merge_time[50], m_time;
+    int number[50];
+    int n = 5000;
+
+    for (int count = 0; count <= 30; count++) {
+        for (int i = 0; i < n; i++) a[i] = rand() % 100000;
+
+        number[count] = n;
+
+        clock_t start = clock();
+        mergeSort(a, 0, n - 1);
+        clock_t end = clock();
+
+        m_time = (double)(end - start) / CLOCKS_PER_SEC;
+        merge_time[count] = m_time;
+
+        n += 500;
+    }
+
+    printf("Input Size\tMerge Sort Time (s)\n");
+    for (int i = 0; i <= 30; i++)
+        printf("%d\t%f\n", number[i], merge_time[i]);
+
+    return 0;
+}
