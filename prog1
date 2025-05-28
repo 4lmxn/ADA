@@ -1,76 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-/*
-plot "D:/KSIT/IV_Sem/ADA_24-25/Lab ProgramS/plot.data" u 1:2 w lp title "Bubble Sort", 
-     "D:/KSIT/IV_Sem/ADA_24-25/Lab ProgramS/plot.data" u 1:3 w lp title "Selection Sort"
-*/
+int i, j, k, a, b, u, v, n, ne = 1;
+int min, mincost = 0, cost[9][9], parent[9];
 
-void bubbleSort(int a[], int n) {
-    int i, j, temp;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n - 1; j++) {
-            if (a[j] > a[j + 1]) {
-                temp = a[j];
-                a[j] = a[j + 1];
-                a[j + 1] = temp;
-            }
-        }
-    }
+int find(int i) {
+    while (parent[i])
+        i = parent[i];
+    return i;
 }
 
-void selectionSort(int a[], int n) {
-    int i, j, temp;
-    for (i = 0; i < n; i++) {
-        for (j = i + 1; j < n; j++) {
-            if (a[i] > a[j]) {
-                temp = a[i];
-                a[i] = a[j];
-                a[j] = temp;
-            }
-        }
+int union_node(int i, int j) {
+    if (i != j) {
+        parent[j] = i;
+        return 1;
     }
+    return 0;
 }
 
 int main() {
-    int a[100000], b[100000];
-    int i, n = 3000;
-    int number[30];
-    double bubble_time[30], selection_time[30];
-    clock_t start, end;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
 
-    srand(200);
+    printf("\nEnter the cost adjacency matrix:\n");
+    for (i = 1; i <= n; i++) {
+        for (j = 1; j <= n; j++) {
+            scanf("%d", &cost[i][j]);
+            if (cost[i][j] == 0)
+                cost[i][j] = 999;
+        }
+    }
 
-    for (int count = 0; count < 30; count++) {
-        for (i = 0; i < n; i++) {
-            a[i] = rand() % 10000;
-            b[i] = rand() % 10000;
+    printf("The edges of Minimum Cost Spanning Tree are:\n");
+    while (ne < n) {
+        for (i = 1, min = 999; i <= n; i++) {
+            for (j = 1; j <= n; j++) {
+                if (cost[i][j] < min) {
+                    min = cost[i][j];
+                    a = u = i;
+                    b = v = j;
+                }
+            }
         }
 
-        number[count] = n;
+        u = find(u);
+        v = find(v);
 
-        start = clock();
-        bubbleSort(a, n);
-        end = clock();
-        bubble_time[count] = (double)(end - start) / CLOCKS_PER_SEC;
+        if (union_node(u, v)) {
+            printf("%d edge (%d,%d) = %d\n", ne++, a, b, min);
+            mincost += min;
+        }
 
-        start = clock();
-        selectionSort(b, n);
-        end = clock();
-        selection_time[count] = (double)(end - start) / CLOCKS_PER_SEC;
-
-        printf("%d \t %f \t %f\n", number[count], bubble_time[count], selection_time[count]);
-
-        n += 3000;
+        cost[a][b] = cost[b][a] = 999;
     }
 
-    // Final Output
-    printf("-----------------------------------------------------\n");
-    printf("Number\tBubble Time\tSelection Time\n");
-    for (i = 0; i < 30; i++) {
-        printf("%d\t%f\t%f\n", number[i], bubble_time[i], selection_time[i]);
-    }
-
+    printf("\nMinimum cost = %d\n", mincost);
     return 0;
 }
