@@ -1,79 +1,56 @@
-/* plot "quick.data" u 1:2 w lp title "Quick Sort" */
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-int partition(int a[], int low, int high) {
-    int p = a[low];
-    int i = low;
-    int j = high;
-    int temp;
+int primsAlgorithm(int a[10][10], int n, int source) {
+    int s[10], d[10], i, j, min, u, v, sum = 0;
 
-    while (i < j) {
-        while (a[i] <= p && i <= high - 1) {
-            i++;
+    for (i = 1; i <= n; i++) {
+        d[i] = a[source][i];
+        s[i] = 0;
+    }
+
+    s[source] = 1;
+
+    for (i = 1; i < n; i++) {
+        min = 999;
+        for (j = 1; j <= n; j++) {
+            if (s[j] == 0 && min > d[j]) {
+                min = d[j];
+                u = j;
+            }
         }
-        while (a[j] > p && j >= low + 1) {
-            j--;
-        }
-        if (i < j) {
-            temp = a[i];
-            a[i] = a[j];
-            a[j] = temp;
+
+        s[u] = 1;
+        sum += d[u];
+
+        for (v = 1; v <= n; v++) {
+            if (s[v] == 0 && d[v] > a[u][v])
+                d[v] = a[u][v];
         }
     }
 
-    temp = a[low];
-    a[low] = a[j];
-    a[j] = temp;
-
-    return j;
-}
-
-void quickSort(int a[], int low, int high) {
-    if (low < high) {
-        int pi = partition(a, low, high);
-        quickSort(a, low, pi - 1);
-        quickSort(a, pi + 1, high);
-    }
+    return sum;
 }
 
 int main() {
-    int a[100000], b[100000];
-    int i;
-    clock_t start, end;
-    double quick_time[50], q_time;
-    int number[50];
-    int tot = 30;
-    int n = 1000;
+    int n, a[10][10], i, j, source, cost;
 
-    srand(20);
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
 
-    for (int count = 0; count <= tot; count++) {
-        for (i = 0; i < n; i++) {
-            a[i] = rand() % 10000;
-            b[i] = a[i]; // though b[] is unused
-        }
+    printf("Enter the cost adjacency matrix:\n");
+    for (i = 1; i <= n; i++)
+        for (j = 1; j <= n; j++)
+            scanf("%d", &a[i][j]);
 
-        number[count] = n;
+    printf("Enter the source node: ");
+    scanf("%d", &source);
 
-        start = clock();
-        quickSort(a, 0, n - 1);
-        end = clock();
+    cost = primsAlgorithm(a, n, source);
 
-        q_time = (double)(end - start) / CLOCKS_PER_SEC;
-        quick_time[count] = q_time;
-
-        printf("%d\t%d\t%f\n", count + 1, number[count], quick_time[count]);
-
-        n += 1000;
-    }
-
-    printf("-----------------------------------------------------\n");
-    printf("Input Size\tQuick Sort Time (s)\n");
-    for (int i = 0; i <= tot; i++) {
-        printf("%d\t%f\n", number[i], quick_time[i]);
-    }
+    if (cost == 999)
+        printf("Minimum Spanning Tree does not exist!\n");
+    else
+        printf("Cost of Minimum Spanning Tree is %d!\n", cost);
 
     return 0;
 }
