@@ -1,0 +1,66 @@
+#include <stdio.h>
+
+void dijkstrasAlgorithm(int a[10][10], int n, int source) {
+    int d[10], s[10] = {0}, p[10], i, j, min, u, v;
+
+    for (i = 1; i <= n; i++) {
+        d[i] = a[source][i];
+        p[i] = source;
+    }
+
+    s[source] = 1;
+
+    for (i = 1; i < n; i++) {
+        min = 999;
+        for (j = 1; j <= n; j++) {
+            if (s[j] == 0 && d[j] < min) {
+                min = d[j];
+                u = j;
+            }
+        }
+
+        s[u] = 1;
+
+        for (v = 1; v <= n; v++) {
+            if (s[v] == 0 && d[v] > d[u] + a[u][v]) {
+                d[v] = d[u] + a[u][v];
+                p[v] = u;
+            }
+        }
+    }
+
+    printf("Shortest Paths from Vertex %d:\n", source);
+    for (i = 1; i <= n; i++) {
+        printf("Path to %d: ", i);
+        if (i == source) {
+            printf("%d = 0\n", source);
+            continue;
+        }
+
+        j = i;
+        while (j != source) {
+            printf("%d <- ", j);
+            j = p[j];
+        }
+        printf("%d = %d\n", source, d[i]);
+    }
+}
+
+int main() {
+    int a[10][10], n, source, i, j;
+
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the cost matrix:\n");
+    for (i = 1; i <= n; i++)
+        for (j = 1; j <= n; j++)
+            scanf("%d", &a[i][j]);
+
+    printf("Enter the source node: ");
+    scanf("%d", &source);
+
+    dijkstrasAlgorithm(a, n, source);
+
+    return 0;
+}
