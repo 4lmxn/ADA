@@ -1,54 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
-
-void selectionSort(int a[], int n) {
-    int i, j, temp;
-    for (i = 0; i < n; i++) {
+void selectionSort(int arr[], int n) {
+    int i, j, min, temp;
+    for (i = 0; i < n - 1; i++) {
+        min = i;
         for (j = i + 1; j < n; j++) {
-            if (a[i] > a[j]) {
-                temp = a[i];
-                a[i] = a[j];
-                a[j] = temp;
-            }
+            if (arr[j] < arr[min])
+                min = j;
         }
+        temp = arr[i];
+        arr[i] = arr[min];
+        arr[min] = temp;
+    }
+}
+
+void generateRandomNumbers(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % 10000;
     }
 }
 
 int main() {
-    int a[100000], b[100000];
-    int i, n = 3000;
-    int number[30];
-    double bubble_time[30], selection_time[30];
-    clock_t start, end;
+    struct timeval tv;
+    double start, end;
+    int a[500000], n;
 
-    srand(200);
+    printf("Enter the number of elements to sort: ");
+    scanf("%d", &n);
 
-    for (int count = 0; count < 30; count++) {
-        for (i = 0; i < n; i++) {
-            a[i] = rand() % 10000;
-            b[i] = rand() % 10000;
-        }
+    generateRandomNumbers(a, n);
 
-        number[count] = n;
+    gettimeofday(&tv, NULL);
+    start = tv.tv_sec + (tv.tv_usec / 1000000.0);
+    selectionSort(a, n);
+    gettimeofday(&tv, NULL);
+    end = tv.tv_sec + (tv.tv_usec / 1000000.0);
 
-        start = clock();
-        selectionSort(b, n);
-        end = clock();
-        selection_time[count] = (double)(end - start) / CLOCKS_PER_SEC;
-
-        printf("%d \t %f \t %f\n", number[count], bubble_time[count], selection_time[count]);
-
-        n += 3000;
+    printf("Sorted Array:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", a[i]);
     }
-
-    // Final Output
-    printf("-----------------------------------------------------\n");
-    printf("Number\tSelection Time\n");
-    for (i = 0; i < 30; i++) {
-        printf("%d\t%f\t%f\n", number[i], selection_time[i]);
-    }
+    printf("\nTime taken: %lf seconds\n", end - start);
 
     return 0;
 }
