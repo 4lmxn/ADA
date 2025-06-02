@@ -1,67 +1,40 @@
 #include <stdio.h>
 
-int value[10][10];
-
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
-
-int knapsack(int n, int m, int cost[], int weight[]) {
-    int i, j;
-    for (i = 1; i <= n; i++) {
-        for (j = 1; j <= m; j++) {
-            if (j < weight[i])
-                value[i][j] = value[i - 1][j];
-            else
-                value[i][j] = max(value[i - 1][j], cost[i] + value[i - 1][j - weight[i]]);
-        }
-    }
-    return value[n][m];
-}
-
-void findSolution(int n, int m, int weight[]) {
-    int i = n, j = m;
-    int x[10] = {0};
-
-    while (i != 0 && j != 0) {
-        if (value[i][j] != value[i - 1][j]) {
-            x[i] = 1;
-            j -= weight[i];
-        }
-        i--;
-    }
-
-    printf("Selected items:\n");
-    for (i = 1; i <= n; i++)
-        if (x[i]) printf("Item %d\n", i);
-}
+void topologicalSort(int a[10][10], int n, int indegree[10]);
 
 int main() {
-    int i, j, n, m, cost[10], weight[10], optimalVal;
+    int a[10][10], indegree[10] = {0}, i, j, n;
 
-    printf("Enter number of items: ");
+    printf("Enter the number of nodes: ");
     scanf("%d", &n);
 
-    printf("Enter weights of items: ");
-    for (i = 1; i <= n; i++) scanf("%d", &weight[i]);
-
-    printf("Enter profits of items: ");
-    for (i = 1; i <= n; i++) scanf("%d", &cost[i]);
-
-    printf("Enter knapsack capacity: ");
-    scanf("%d", &m);
-
-    optimalVal = knapsack(n, m, cost, weight);
-
-    printf("Knapsack Matrix:\n");
-    for (i = 0; i <= n; i++) {
-        for (j = 0; j <= m; j++)
-            printf("%d\t", value[i][j]);
-        printf("\n");
+    printf("Enter the Adjacency Matrix: \n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &a[i][j]);
+            if (a[i][j] == 1) indegree[j]++;
+        }
     }
 
-    printf("Optimal solution value: %d\n", optimalVal);
-    findSolution(n, m, weight);
-
+    printf("The Topological Sorted Order is: \n");
+    topologicalSort(a, n, indegree);
     return 0;
+}
+
+void topologicalSort(int a[10][10], int n, int indegree[10]) {
+    int i, j;
+
+    for (int k = 0; k < n; k++) {
+        for (i = 0; i < n; i++) {
+            if (indegree[i] == 0) {
+                printf("%d\t", i + 1);
+                indegree[i] = -1;
+
+                for (j = 0; j < n; j++) {
+                    if (a[i][j] == 1) indegree[j]--;
+                }
+                break;
+            }
+        }
+    }
 }
