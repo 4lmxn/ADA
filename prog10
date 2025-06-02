@@ -1,79 +1,68 @@
-/* plot "quick.data" u 1:2 w lp title "Quick Sort" */
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
-int partition(int a[], int low, int high) {
-    int p = a[low];
-    int i = low;
-    int j = high;
-    int temp;
+void quickSort(int arr[], int low, int high);
+int partition(int arr[], int low, int high);
 
-    while (i < j) {
-        while (a[i] <= p && i <= high - 1) {
-            i++;
-        }
-        while (a[j] > p && j >= low + 1) {
-            j--;
-        }
-        if (i < j) {
-            temp = a[i];
-            a[i] = a[j];
-            a[j] = temp;
-        }
-    }
-
-    temp = a[low];
-    a[low] = a[j];
-    a[j] = temp;
-
-    return j;
-}
-
-void quickSort(int a[], int low, int high) {
-    if (low < high) {
-        int pi = partition(a, low, high);
-        quickSort(a, low, pi - 1);
-        quickSort(a, pi + 1, high);
+void generateRandomNumbers(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % 10000;
     }
 }
 
 int main() {
-    int a[100000], b[100000];
-    int i;
-    clock_t start, end;
-    double quick_time[50], q_time;
-    int number[50];
-    int tot = 30;
-    int n = 1000;
+    struct timeval tv;
+    double start, end;
+    int a[500000], n;
 
-    srand(20);
+    printf("Enter the number of elements to sort: ");
+    scanf("%d", &n);
 
-    for (int count = 0; count <= tot; count++) {
-        for (i = 0; i < n; i++) {
-            a[i] = rand() % 10000;
-            b[i] = a[i]; // though b[] is unused
-        }
+    generateRandomNumbers(a, n);
 
-        number[count] = n;
+    gettimeofday(&tv, NULL);
+    start = tv.tv_sec + (tv.tv_usec / 1000000.0);
+    quickSort(a, 0, n - 1);
+    gettimeofday(&tv, NULL);
+    end = tv.tv_sec + (tv.tv_usec / 1000000.0);
 
-        start = clock();
-        quickSort(a, 0, n - 1);
-        end = clock();
-
-        q_time = (double)(end - start) / CLOCKS_PER_SEC;
-        quick_time[count] = q_time;
-
-        printf("%d\t%d\t%f\n", count + 1, number[count], quick_time[count]);
-
-        n += 1000;
+    printf("Sorted Array:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", a[i]);
     }
-
-    printf("-----------------------------------------------------\n");
-    printf("Input Size\tQuick Sort Time (s)\n");
-    for (int i = 0; i <= tot; i++) {
-        printf("%d\t%f\n", number[i], quick_time[i]);
-    }
+    printf("\nTime taken: %lf seconds\n", end - start);
 
     return 0;
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pivot = partition(arr, low, high);
+        quickSort(arr, low, pivot - 1);
+        quickSort(arr, pivot + 1, high);
+    }
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[low];
+    int i = low, j = high + 1;
+
+    do {
+        do { i++; } while (arr[i] < pivot);
+        do { j--; } while (arr[j] > pivot);
+
+        if (i < j) {
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    } while (i < j);
+
+    int temp = arr[low];
+    arr[low] = arr[j];
+    arr[j] = temp;
+
+    return j;
 }
