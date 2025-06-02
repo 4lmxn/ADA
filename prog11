@@ -1,58 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
-void merge(long int a[], int left, int mid, int right) {
-    int n1 = mid - left + 1;
-    int n2 = right - mid;
-    long int leftArr[n1], rightArr[n2];
+int b[100000];
 
-    for (int i = 0; i < n1; i++) leftArr[i] = a[left + i];
-    for (int j = 0; j < n2; j++) rightArr[j] = a[mid + 1 + j];
-
-    int i = 0, j = 0, k = left;
-    while (i < n1 && j < n2) {
-        if (leftArr[i] <= rightArr[j]) a[k++] = leftArr[i++];
-        else a[k++] = rightArr[j++];
+void merge(int a[], int low, int mid, int high) {
+    int l1, l2, i;
+    for (l1 = low, l2 = mid + 1, i = low; l1 <= mid && l2 <= high; i++) {
+        if (a[l1] <= a[l2]) {
+            b[i] = a[l1++];
+        } else {
+            b[i] = a[l2++];
+        }
     }
-
-    while (i < n1) a[k++] = leftArr[i++];
-    while (j < n2) a[k++] = rightArr[j++];
+    while (l1 <= mid) {
+        b[i++] = a[l1++];
+    }
+    while (l2 <= high) {
+        b[i++] = a[l2++];
+    }
+    for (i = low; i <= high; i++) {
+        a[i] = b[i];
+    }
 }
 
-void mergeSort(long int a[], int left, int right) {
-    if (left < right) {
-        int mid = left + (right - left) / 2;
-        mergeSort(a, left, mid);
-        mergeSort(a, mid + 1, right);
-        merge(a, left, mid, right);
+void mergeSort(int a[], int low, int high) {
+    if (low < high) {
+        int mid = (low + high) / 2;
+        mergeSort(a, low, mid);
+        mergeSort(a, mid + 1, high);
+        merge(a, low, mid, high);
+    }
+}
+
+void generateRandomNumbers(int a[], int n) {
+    srand(time(NULL));
+    for (int i = 0; i < n; i++) {
+        a[i] = rand() % 10000;
     }
 }
 
 int main() {
-    long int a[100000];
-    float merge_time[50], m_time;
-    int number[50];
-    int n = 5000;
+    struct timeval tv;
+    double start, end;
+    int a[500000], n;
 
-    for (int count = 0; count <= 30; count++) {
-        for (int i = 0; i < n; i++) a[i] = rand() % 100000;
+    printf("Enter the number of elements to sort: ");
+    scanf("%d", &n);
 
-        number[count] = n;
+    generateRandomNumbers(a, n);
 
-        clock_t start = clock();
-        mergeSort(a, 0, n - 1);
-        clock_t end = clock();
+    gettimeofday(&tv, NULL);
+    start = tv.tv_sec + (tv.tv_usec / 1000000.0);
+    mergeSort(a, 0, n - 1);
+    gettimeofday(&tv, NULL);
+    end = tv.tv_sec + (tv.tv_usec / 1000000.0);
 
-        m_time = (double)(end - start) / CLOCKS_PER_SEC;
-        merge_time[count] = m_time;
-
-        n += 500;
+    printf("Sorted Array:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", a[i]);
     }
-
-    printf("Input Size\tMerge Sort Time (s)\n");
-    for (int i = 0; i <= 30; i++)
-        printf("%d\t%f\n", number[i], merge_time[i]);
+    printf("\nTime taken: %lf seconds\n", end - start);
 
     return 0;
 }
