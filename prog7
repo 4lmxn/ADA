@@ -1,47 +1,77 @@
 #include <stdio.h>
-#include <limits.h>
 
-#define INF INT_MAX
-#define N 10
+int value[10][10];
 
-int tsp(int graph[N][N], int visited[], int currPos, int n, int count, int cost);
+int max(int a, int b);
+int knapsack(int n, int m, int cost[], int weight[]);
+void findSolution(int n, int m, int weight[]);
 
 int main() {
-    int n, i, j;
-    int graph[N][N], visited[N] = {0};
-    int min_cost;
+    int i, j, n, m, cost[10], weight[10], optiVal;
 
-    printf("Enter the number of cities: ");
+    printf("Enter the number of items: ");
     scanf("%d", &n);
 
-    printf("Enter the cost matrix:\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            scanf("%d", &graph[i][j]);
-        }
+    printf("Enter the weights of each item: ");
+    for (i = 1; i <= n; i++)
+        scanf("%d", &weight[i]);
+
+    printf("Enter the profits of each item: ");
+    for (i = 1; i <= n; i++)
+        scanf("%d", &cost[i]);
+
+    printf("Enter the capacity of knapsack: ");
+    scanf("%d", &m);
+
+    optiVal = knapsack(n, m, cost, weight);
+
+    printf("Solution to the Knapsack Problem: \n");
+    for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++)
+            printf("%d\t", value[i][j]);
+        printf("\n");
     }
 
-    visited[0] = 1;
-    min_cost = tsp(graph, visited, 0, n, 1, 0);
-
-    printf("Minimum cost = %d\n", min_cost);
+    printf("The optimal solution value is: %d\n", optiVal);
+    findSolution(n, m, weight);
     return 0;
 }
 
-int tsp(int graph[N][N], int visited[], int currPos, int n, int count, int cost) {
-    if (count == n) {
-        return cost + graph[currPos][0];
-    }
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
 
-    int min_cost = INF;
-    for (int i = 0; i < n; i++) {
-        if (!visited[i] && graph[currPos][i]) {
-            visited[i] = 1;
-            int temp_cost = tsp(graph, visited, i, n, count + 1, cost + graph[currPos][i]);
-            min_cost = (temp_cost < min_cost) ? temp_cost : min_cost;
-            visited[i] = 0;
+int knapsack(int n, int m, int cost[], int weight[]) {
+    int i, j;
+    for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++) {
+            if (i == 0 || j == 0) {
+                value[i][j] = 0;
+            } else if (weight[i] <= j) {
+                value[i][j] = max(value[i - 1][j], cost[i] + value[i - 1][j - weight[i]]);
+            } else {
+                value[i][j] = value[i - 1][j];
+            }
         }
     }
+    return value[n][m];
+}
 
-    return min_cost;
+void findSolution(int n, int m, int weight[]) {
+    int i = n, j = m;
+    int x[10];
+
+    while (i != 0 && j != 0) {
+        if (value[i][j] != value[i - 1][j]) {
+            x[i] = 1;
+            j -= weight[i];
+        }
+        i--;
+    }
+
+    printf("Items selected are: ");
+    for (i = 1; i <= n; i++) {
+        if (x[i] == 1)
+            printf("%d ", i);
+    }
 }
