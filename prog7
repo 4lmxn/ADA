@@ -1,36 +1,47 @@
 #include <stdio.h>
+#include <limits.h>
 
-int n = 5;
-int w[10] = {3, 3, 2, 5, 1};
-int p[10] = {10, 15, 10, 12, 8};
-int W = 10;
+#define INF INT_MAX
+#define N 10
+
+int tsp(int graph[N][N], int visited[], int currPos, int n, int count, int cost);
 
 int main() {
-    int cur_w = W;
-    float tot_v = 0.0;
-    int i, maxi, used[10] = {0};
+    int n, i, j;
+    int graph[N][N], visited[N] = {0};
+    int min_cost;
 
-    while (cur_w > 0) {
-        maxi = -1;
+    printf("Enter the number of cities: ");
+    scanf("%d", &n);
 
-        for (i = 0; i < n; ++i) {
-            if (used[i] == 0 && (maxi == -1 || (float)p[i]/w[i] > (float)p[maxi]/w[maxi]))
-                maxi = i;
-        }
-
-        used[maxi] = 1;
-        cur_w -= w[maxi];
-
-        if (cur_w >= 0) {
-            printf("Added object %d (%d, %d) completely. Space left: %d\n", maxi + 1, p[maxi], w[maxi], cur_w);
-            tot_v += p[maxi];
-        } else {
-            float fraction = 1 + (float)cur_w / w[maxi];
-            printf("Added %d%% of object %d (%d, %d).\n", (int)(fraction * 100), maxi + 1, p[maxi], w[maxi]);
-            tot_v += fraction * p[maxi];
+    printf("Enter the cost matrix:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
         }
     }
 
-    printf("Total value: %.2f\n", tot_v);
+    visited[0] = 1;
+    min_cost = tsp(graph, visited, 0, n, 1, 0);
+
+    printf("Minimum cost = %d\n", min_cost);
     return 0;
+}
+
+int tsp(int graph[N][N], int visited[], int currPos, int n, int count, int cost) {
+    if (count == n) {
+        return cost + graph[currPos][0];
+    }
+
+    int min_cost = INF;
+    for (int i = 0; i < n; i++) {
+        if (!visited[i] && graph[currPos][i]) {
+            visited[i] = 1;
+            int temp_cost = tsp(graph, visited, i, n, count + 1, cost + graph[currPos][i]);
+            min_cost = (temp_cost < min_cost) ? temp_cost : min_cost;
+            visited[i] = 0;
+        }
+    }
+
+    return min_cost;
 }
