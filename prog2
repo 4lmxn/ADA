@@ -1,56 +1,38 @@
-#include <stdio.h>
-
-int primsAlgorithm(int a[10][10], int n, int source) {
-    int s[10], d[10], i, j, min, u, v, sum = 0;
-
-    for (i = 1; i <= n; i++) {
-        d[i] = a[source][i];
-        s[i] = 0;
-    }
-
-    s[source] = 1;
-
-    for (i = 1; i < n; i++) {
-        min = 999;
-        for (j = 1; j <= n; j++) {
-            if (s[j] == 0 && min > d[j]) {
-                min = d[j];
-                u = j;
-            }
-        }
-
-        s[u] = 1;
-        sum += d[u];
-
-        for (v = 1; v <= n; v++) {
-            if (s[v] == 0 && d[v] > a[u][v])
-                d[v] = a[u][v];
-        }
-    }
-
-    return sum;
+#include<stdio.h>
+intne=1,min_cost=0;
+intmain()
+{
+int n,i,j,min,cost[20][20],a,u,b,v,source,visited[20];printf("Entertheno. ofnodes:");
+scanf("%d",&n);
+printf("Enter the cost matrix:\n");for(i=1;i<=n;i++)
+{
+for(j=1;j<=n;j++)
+{
+scanf("%d",&cost[i][j]);
 }
-
-int main() {
-    int n, a[10][10], i, j, source, cost;
-
-    printf("Enter the number of nodes: ");
-    scanf("%d", &n);
-
-    printf("Enter the cost adjacency matrix:\n");
-    for (i = 1; i <= n; i++)
-        for (j = 1; j <= n; j++)
-            scanf("%d", &a[i][j]);
-
-    printf("Enter the source node: ");
-    scanf("%d", &source);
-
-    cost = primsAlgorithm(a, n, source);
-
-    if (cost == 999)
-        printf("Minimum Spanning Tree does not exist!\n");
-    else
-        printf("Cost of Minimum Spanning Tree is %d!\n", cost);
-
-    return 0;
+}
+for(i=1;i<=n;i++)visited[i]=0;
+printf("Enter the root node:");scanf("%d",&source);visited[source]=1;
+printf("\nMinimum cost spanning tree is\n");while(ne<n)
+{
+min=999;for(i=1;i<=n;i++)
+{
+for(j=1;j<=n;j++)
+{
+if(cost[i][j]<min)if(visited[i]==0)continue;
+else
+{
+min=cost[i][j];a=u=i;
+b=v=j;
+}
+}
+}
+if(visited[u]==0||visited[v]==0)
+{
+printf("\nEdge %d\t(%d->%d)=%d\n",ne++,a,b,min);min_cost=min_cost+min;
+visited[b]=1;
+}
+cost[a][b]=cost[b][a]=999;
+}
+printf("\nMinimumcost=%d\n",min_cost);
 }
