@@ -1,51 +1,57 @@
 #include <stdio.h>
+#include <math.h>
 
-int x[10], count;
+int board[20], count = 0;
 
-int place(int k, int i) {
-    for (int j = 1; j < k; j++)
-        if (x[j] == i || (j - x[j] == k - i) || (j + x[j] == k + i))
-            return 0;
-    return 1;
-}
-
-void display(int n) {
-    char board[10][10];
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= n; j++)
-            board[i][j] = '-';
-
-    for (int i = 1; i <= n; i++)
-        board[i][x[i]] = 'Q';
-
-    printf("Solution #%d:\n", ++count);
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++)
-            printf("%c\t", board[i][j]);
-        printf("\n");
-    }
-}
-
-void nQueens(int k, int n) {
-    for (int i = 1; i <= n; i++) {
-        if (place(k, i)) {
-            x[k] = i;
-            if (k == n)
-                display(n);
-            else
-                nQueens(k + 1, n);
-        }
-    }
-}
+void printSolution(int n);
+int isSafe(int row, int column);
+void solveNQueens(int row, int n);
 
 int main() {
     int n;
-    printf("Enter the number of queens: ");
+
+    printf("Enter number of Queens: ");
     scanf("%d", &n);
-    nQueens(1, n);
-    if (count == 0)
-        printf("No solutions found!\n");
-    else
-        printf("Total solutions: %d\n", count);
+
+    solveNQueens(1, n);
     return 0;
+}
+
+void printSolution(int n) {
+    int i, j;
+    printf("\nSolution %d:\n", ++count);
+    for (i = 1; i <= n; i++) printf("\t%d", i);
+
+    for (i = 1; i <= n; i++) {
+        printf("\n%d", i);
+        for (j = 1; j <= n; j++) {
+            if (board[i] == j)
+                printf("\tQ");
+            else
+                printf("\t-");
+        }
+    }
+    printf("\n");
+}
+
+int isSafe(int row, int column) {
+    int i;
+    for (i = 1; i <= row - 1; i++) {
+        if (board[i] == column || abs(board[i] - column) == abs(i - row))
+            return 0;
+    }
+    return 1;
+}
+
+void solveNQueens(int row, int n) {
+    int column;
+    for (column = 1; column <= n; column++) {
+        if (isSafe(row, column)) {
+            board[row] = column;
+            if (row == n)
+                printSolution(n);
+            else
+                solveNQueens(row + 1, n);
+        }
+    }
 }
